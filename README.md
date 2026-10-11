@@ -1,144 +1,168 @@
-# Password Generator
+# Entropy
 
-A simple, fast and reliable console utility for generating cryptographically strong passwords.
+A console utility for generating cryptographically strong passwords.
+
+> Entropy is a measure of unpredictability. A password is exactly as good as it is random.
 
 ---
 
 ## Features
 
-- **Cryptographic strength:** generation is based on the `RandomNumberGenerator` cryptographic random number generator.
-- **Flexible character set configuration:** ability to disable lowercase letters, uppercase letters, digits and special characters.
+- **Cryptographic strength.** Passwords are generated with `RandomNumberGenerator` from `System.Security.Cryptography`.
+- **Flexible character sets.** Lowercase and uppercase letters, digits, and special characters can each be excluded individually.
 - **Two launch modes:**
-  - **Via arguments:** instant generation with fine-tuning through short flags.
-  - **Interactive:** step-by-step console wizard with quick selection via the Enter key.
-- **Strict validation:** length range check (from 8 to 64 characters) and protection against invalid input.
-- **No third-party dependencies:** uses only the standard library.
-* **Colored output:** clear highlighting of information and warnings in the terminal.
+  - **with arguments** — the password is printed immediately, no questions asked;
+  - **interactive** — a step-by-step dialog where options are chosen with the keyboard.
+- **No third-party dependencies.** Only the .NET standard library is used.
 
 ---
 
-## Quick Start
+## Quick start
 
 ### Requirements
 
 Building and running requires the [.NET 10.0 SDK](https://dotnet.microsoft.com/download).
 
-### Build and Run
+### Build and run
 
-Clone the repository and navigate to the project folder.
+Clone the repository and go to the project folder:
 
 ```bash
-git clone https://github.com/demurel0/password-generator.git
-cd password-generator
+git clone https://github.com/demurel0/entropy.git
+cd entropy
 ```
 
 ---
 
 ## Usage
 
-### Running with Arguments
+### Running with arguments
 
-You can pass only the length or combine it with flags to exclude character sets.
+You can pass just the length, or combine it with flags that exclude character sets:
 
 ```bash
-dotnet run --project PasswordGenerator -- [options]
+dotnet run --project src/Entropy -- [length] [options]
 ```
 
-#### Available Parameters
+#### Available options
 
-| Flag | Description | Default Value |
+| Flag | Description | Default |
 | :--- | :--- | :--- |
-| `-l, --length <number>` | Password length | 16 |
-| `-L, --lower` | Exclude lowercase letters | Enabled |
-| `-U, --upper` | Exclude uppercase letters | Enabled |
-| `-D, --digits` | Exclude digits | Enabled |
-| `-S, --special` | Exclude special characters | Enabled |
+| `--length <number>` | Password length | 16 |
+| `-l, --no-lower` | Exclude lowercase letters | Included |
+| `-u, --no-upper` | Exclude uppercase letters | Included |
+| `-d, --no-digits` | Exclude digits | Included |
+| `-s, --no-special` | Exclude special characters | Included |
 | `-h, --help` | Show usage help | - |
 
-### Interactive Mode
+### Interactive mode
 
-If you launch the utility without arguments, a step-by-step setup wizard opens. The **Enter** key automatically selects the option marked with a capital letter.
+If you run the utility without arguments, a step-by-step setup wizard opens. The **Enter** key automatically selects the option highlighted with a capital letter:
 
 ```bash
-dotnet run --project PasswordGenerator
+dotnet run --project src/Entropy
 ```
 
 ---
 
-## Usage Examples
+## Examples
 
-### Generation via Flags
+### Generating with arguments
 
 ```console
-$ dotnet run --project PasswordGenerator -- -l 14 -S
-Generated password: VKer5dvLG50oZt
+$ dotnet run --project src/Entropy -- 20
+Generated password: Q8f!mV2#tR9&xL4$wZ1p
 
-$ dotnet run --project PasswordGenerator -- 20
-Generated password: O8IV-*x(iS_zmC&FmVvg
+$ dotnet run --project src/Entropy -- 12 -s
+Generated password: k7Qx2mPzR9dL
 
-$ dotnet run --project PasswordGenerator -- --length 12 --special
-Generated password: izyw6pbd6Avc
+$ dotnet run --project src/Entropy -- --length 24 -d -s
+Generated password: vQmTzLkPaRxWbNcYdFgHjKeS
+
+$ dotnet run --project src/Entropy -- 16 -l -u
+Generated password: 4-7(2)*9%1^3&_0#
 ```
 
-With invalid arguments, the program prints a message and exits.
+### Errors on invalid arguments
 
 ```console
-$ dotnet run --project PasswordGenerator -- -l 100
+$ dotnet run --project src/Entropy -- 100
 Length must be between 8 and 64.
 
-$ dotnet run --project PasswordGenerator -- -L -U -D -S
+$ dotnet run --project src/Entropy -- -l -u -d -s
 You cannot exclude all character sets at the same time.
 
-$ dotnet run --project PasswordGenerator -- --unknown
+$ dotnet run --project src/Entropy -- --length
+The '--length' flag must be followed by a number.
+
+$ dotnet run --project src/Entropy -- --unknown
 Unknown argument: '--unknown'. Use '-h' or '--help' for help.
 ```
 
-### Interactive Dialog
+### Interactive dialog
 
 ```console
-$ dotnet run --project PasswordGenerator
-Enter password length (8-64): 16
-Include lowercase letters? [Y/n]:
-Include uppercase letters? [Y/n]:
-Include digits? [Y/n]:
-Include special characters? [Y/n]: n
+$ dotnet run --project src/Entropy
+← → length  |  Y/n answer  |  Enter confirm  |  Q quit
 
-Generated password: MKzJOIqsy8aofmvL
+How long should the password be? 12
+Include lowercase letters? Y
+Include uppercase letters? n
+Include digits? n
+Include special characters? y
+
+Generated password: -@x-xd(r#o(h
 ```
 
-If all character sets are disabled, the wizard will require selecting at least one.
+Quit at any step with Q:
 
 ```console
-Include lowercase letters? [Y/n]: n
-Include uppercase letters? [Y/n]: n
-Include digits? [Y/n]: n
-Include special characters? [Y/n]: n
+$ dotnet run --project src/Entropy
+← → length  |  Y/n answer  |  Enter confirm  |  Q quit
 
-Select at least one character set.
+How long should the password be? 16
+Include lowercase letters? Y
+Include uppercase letters?
+Cancelled.
+```
+
+If you disable lowercase letters, uppercase letters, and digits:
+
+```console
+$ dotnet run --project src/Entropy
+← → length  |  Y/n answer  |  Enter confirm  |  Q quit
+
+How long should the password be? 16
+Include lowercase letters? n
+Include uppercase letters? n
+Include digits? n
+Only special characters remain.
+
+Generated password: @#%^(*)-=_+!$&-^
 ```
 
 ### Help
 
 ```console
-$ dotnet run --project PasswordGenerator -- -h
+$ dotnet run --project src/Entropy -- -h
 ┌──────────────────────┐
 │  ••••••••••          │
 └──────────────────────┘
 
 USAGE
-PasswordGenerator [options]
+  Entropy [length] [options]
 
 OPTIONS
-  -l, --length <length>  Password length (8-64)
-  -L, --lower            Exclude lowercase letters
-  -U, --upper            Exclude uppercase letters
-  -D, --digits           Exclude digits
-  -S, --special          Exclude special characters
-  -h, --help             Show help
+  --length <number>  Password length
+  -l, --no-lower     Exclude lowercase letters
+  -u, --no-upper     Exclude uppercase letters
+  -d, --no-digits    Exclude digits
+  -s, --no-special   Exclude special characters
+  -h, --help         Show this help
 ```
 
 ---
 
 ## License
 
-This project is distributed under the [MIT](LICENSE) license.
+Distributed under the [MIT](LICENSE) license.
